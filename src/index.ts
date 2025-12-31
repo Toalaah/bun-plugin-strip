@@ -75,7 +75,7 @@ interface StripConfig {
   compilerOptions: ts.CompilerOptions;
 }
 
-export function stripFunctions(
+function stripFunctions(
   config: StripConfig,
   path: string,
   source: string,
@@ -99,7 +99,7 @@ export function stripFunctions(
     .printNode(ts.EmitHint.Unspecified, transformed!, sourceFile);
 }
 
-export function makeTransformer(
+function makeTransformer(
   config: StripConfig,
 ): ts.TransformerFactory<ts.SourceFile> {
   return (ctx: ts.TransformationContext) => {
