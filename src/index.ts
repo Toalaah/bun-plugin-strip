@@ -9,11 +9,41 @@ import { minimatch } from "minimatch";
 
 export type FilterPattern = ReadonlyArray<string> | string | null;
 export interface Config {
+  /**
+   * Files to include. Uses standard shell-style glob matching.
+   *
+   * If omitted or explicitly set to null, all files will be matched.
+   */
   include?: FilterPattern;
+  /**
+   * Files to skip stripping, even if they are matched by the include pattern(s).
+   *
+   * By default, all files under node_modules are omitted.
+   */
   exclude?: FilterPattern;
+  /**
+   * Whether to remove debugger statements.
+   *
+   * Defaults to true if omitted.
+   */
   debugger?: boolean;
+  /**
+   * A list of function patterns to strip. Uses the same glob syntax as the file include/exclude patterns.
+   *
+   * Defaults to all "console.*" and "assert.*" methods.
+   */
   functions?: FilterPattern;
+  /**
+   * Path to tsconfig file.
+   *
+   * Defaults to ./tsconfig.json if omitted.
+   */
   tsconfigPath?: string;
+  /**
+   * Enable verbose logging.
+   *
+   * Defaults to false if omitted.
+   */
   verbose?: boolean;
 }
 
