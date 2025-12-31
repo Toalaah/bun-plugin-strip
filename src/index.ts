@@ -12,17 +12,14 @@ export interface Config {
   include?: FilterPattern;
   exclude?: FilterPattern;
   debugger?: boolean;
-  functions?: string[];
+  functions?: FilterPattern;
   tsconfigPath?: string;
   verbose?: boolean;
 }
 
 export function Strip(config: Config = {}): BunPlugin {
-  const { include, exclude } = makeFileFilter(
-    config.include ?? null,
-    config.exclude ?? ["*node_modules*"],
-  );
-
+  const include = [...(config.include ?? ["**"])];
+  const exclude = [...(config.exclude ?? ["**node_modules**"])];
   const functions = config.functions ?? ["console.*", "assert.*"];
   const stripDebugger = config.debugger ?? true;
   const tsconfigPath =
@@ -32,15 +29,15 @@ export function Strip(config: Config = {}): BunPlugin {
   verbose = config.verbose ?? verbose;
 
   debug("functions:", functions);
-  debug("file include pattern:", include);
-  debug("file exclude pattern:", exclude);
+  debug("file include patterns:", include);
+  debug("file exclude patterns:", exclude);
 
   let callback: Bun.OnLoadCallback = async ({ path }) => {
     const contents = await Bun.file(path).text();
-    if (exclude.test(path)) {
-      debug("file is excluded:", path);
+    if (exclude.some((pattern) => minimatch(path, pattern))) {
       return { contents };
     }
+
     const config: StripConfig = {
       stripDebugger,
       functions,
@@ -56,10 +53,16 @@ export function Strip(config: Config = {}): BunPlugin {
     callback = async ({}) => undefined;
   }
 
+  const filter = new RegExp(
+    include
+      .map((pattern) => (minimatch.makeRe(pattern) as RegExp).source)
+      .join("|"),
+  );
+
   return {
     name: "strip-debug",
     setup(build) {
-      build.onLoad({ filter: include }, callback);
+      build.onLoad({ filter }, callback);
     },
   };
 }
@@ -67,7 +70,7 @@ export function Strip(config: Config = {}): BunPlugin {
 /* Everything from here on is internal. */
 
 interface StripConfig {
-  functions: string[];
+  functions: FilterPattern;
   stripDebugger: boolean;
   compilerOptions: ts.CompilerOptions;
 }
@@ -94,18 +97,6 @@ export function stripFunctions(
   return ts
     .createPrinter({ newLine: ts.NewLineKind.LineFeed })
     .printNode(ts.EmitHint.Unspecified, transformed!, sourceFile);
-}
-
-export function makeRegex(
-  pattern: FilterPattern,
-  nullMatchesAll: boolean = false,
-) {
-  const def = nullMatchesAll ? "*" : "";
-  const patterns = [pattern ?? def].flat().map((x) => {
-    const re = minimatch.makeRe(x) as RegExp;
-    return "(" + re.source + ")";
-  });
-  return new RegExp(patterns.join("|"));
 }
 
 export function makeTransformer(
@@ -141,6 +132,7 @@ export function makeTransformer(
 }
 
 function shouldStrip(config: StripConfig, expr: ts.Expression): boolean {
+  if (config.functions === null) return false;
   if (!ts.isPropertyAccessExpression(expr)) return false;
 
   const obj = expr.expression;
@@ -152,11 +144,8 @@ function shouldStrip(config: StripConfig, expr: ts.Expression): boolean {
   const methodName = prop.text;
   const fullName = `${baseName}.${methodName}`;
 
-  for (const p of config.functions) {
-    if (minimatch(fullName, p)) {
-      return true;
-    }
-    break;
+  for (const p of [...config.functions]) {
+    if (minimatch(fullName, p)) return true;
   }
   return false;
 }
@@ -170,10 +159,6 @@ function getCompilerOptions(sourcePath: string): ts.CompilerOptions {
   } catch (err) {
     return ts.getDefaultCompilerOptions();
   }
-}
-
-function makeFileFilter(include: FilterPattern, exclude: FilterPattern) {
-  return { include: makeRegex(include, true), exclude: makeRegex(exclude) };
 }
 
 let verbose: boolean = false;
