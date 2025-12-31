@@ -1,8 +1,13 @@
 {
   "name": "bun-plugin-strip",
   "module": "index.ts",
+  "description": "bun plugin for stripping debug functions at build time",
+  "version": "0.1.1",
   "type": "module",
-  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Toalaah/bun-plugin-strip.git"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
