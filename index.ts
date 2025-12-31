@@ -176,10 +176,6 @@ function makeFileFilter(include: FilterPattern, exclude: FilterPattern) {
   return { include: makeRegex(include, true), exclude: makeRegex(exclude) };
 }
 
-function foo(include: FilterPattern) {
-  minimatch.makeRe;
-}
-
 let verbose: boolean = false;
 const debug = (msg: string, ...args: any[]) => {
   if (verbose) {

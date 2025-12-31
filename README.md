@@ -1,15 +1,37 @@
-# bun-plugin-strip
+bun-plugin-strip
+================
 
-To install dependencies:
+A Bun plugin for stripping debug functions at build time.
 
-```bash
-bun install
+Very similar in usage and functionality to `@rollup/plugin-strip`.
+
+Usage
+-----
+
+```typescript
+import { Strip } from "bun-plugin-strip";
+
+await Bun.build({
+  // ...
+  plugins: [
+    Strip({
+      include: ["**/*.ts"],
+      exclude: ["**/*.test.ts"],
+      functions: ["console.*", "myModule.foo"],
+    })
+  ],
+  // ...
+});
 ```
 
-To run:
+Installation
+------------
 
 ```bash
-bun run index.ts
+bun add bun-plugin-strip
 ```
 
-This project was created using `bun init` in bun v1.3.5. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+License
+-------
+
+This project is licensed under the MIT license.
