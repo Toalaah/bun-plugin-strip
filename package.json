@@ -2,7 +2,8 @@
   "name": "bun-plugin-strip",
   "module": "index.ts",
   "description": "bun plugin for stripping debug functions at build time",
-  "version": "0.1.1",
+  "version": "0.1.2",
+  "license": "MIT",
   "type": "module",
   "repository": {
     "type": "git",
