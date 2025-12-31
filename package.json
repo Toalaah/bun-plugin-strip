@@ -1,14 +1,30 @@
 {
   "name": "bun-plugin-strip",
-  "module": "index.ts",
+  "module": "src/index.ts",
   "description": "bun plugin for stripping debug functions at build time",
   "version": "0.1.2",
   "license": "MIT",
   "type": "module",
+  "author": "Samuel Kunst <samuel@kunst.me>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Toalaah/bun-plugin-strip.git"
+    "url": "git+https://github.com/Toalaah/bun-plugin-strip.git"
   },
+  "bugs": "https://github.com/Toalaah/bun-plugin-strip/issues",
+  "homepage": "https://github.com/Toalaah/bun-plugin-strip",
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
+  "scripts": {
+    "build": "bun build.ts"
+  },
+  "files": [ "dist", "src" ],
+  "keywords": [
+    "bun",
+    "plugin"
+  ],
   "devDependencies": {
     "@types/bun": "latest"
   },
