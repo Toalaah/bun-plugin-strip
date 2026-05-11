@@ -3,7 +3,7 @@
   "main": "dist/index.js",
   "module": "src/index.ts",
   "description": "bun plugin for stripping debug functions at build time",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "license": "MIT",
   "type": "module",
   "types": "dist/index.d.ts",
@@ -25,7 +25,9 @@
   "scripts": {
     "build": "bun build.ts"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "keywords": [
     "bun",
     "plugin"
